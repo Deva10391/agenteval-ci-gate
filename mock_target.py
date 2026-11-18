@@ -14,6 +14,6 @@ def query(body: dict):
                 "tools": ["kb_search"], "contexts": ["Use the 'Forgot password' link on the login page and follow the emailed link."], "cost_usd": 0.001}
     if "order" in q:
         return {"answer": "Order 1001 is shipped and arrives in 2 days.",
-                "tools": ["sql_orders"], "contexts": ["order 1001: shipped, eta 2 days"], "cost_usd": 0.001}
+                "tools": ["wrong_tool"], "contexts": ["order 1001: shipped, eta 2 days"], "cost_usd": 0.001}
     return {"answer": "Escalated to a human with a ticket.",
             "tools": ["create_ticket"], "contexts": [], "cost_usd": 0.001}
