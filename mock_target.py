@@ -10,8 +10,8 @@ def health():
 def query(body: dict):
     q = body["query"].lower()
     if "password" in q:
-        return {"answer": "Use the 'Forgot password' link on the login page and follow the emailed link.",
-                "tools": ["kb_search"], "contexts": ["Use the 'Forgot password' link on the login page and follow the emailed link."], "cost_usd": 0.001}
+        return {"answer": "I do not know.",
+                "tools": ["kb_search"], "contexts": ["I do not know."], "cost_usd": 0.001}
     if "order" in q:
         return {"answer": "Order 1001 is shipped and arrives in 2 days.",
                 "tools": ["sql_orders"], "contexts": ["order 1001: shipped, eta 2 days"], "cost_usd": 0.001}
