@@ -1,0 +1,44 @@
+name: agenteval
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. Build and start the PR's P1/P2 build (Dockerfile.target = the service under test)
+      - name: Start target
+        run: |
+          docker build -t target-build -f Dockerfile.target .
+          docker run -d --name target -p 8000:8000 \
+            -e API_KEY=${{ secrets.TARGET_API_KEY }} \
+            -e LLM_API_KEY=${{ secrets.LLM_API_KEY }} target-build
+          for i in $(seq 1 30); do curl -sf localhost:8000/health && break || sleep 2; done
+
+      # 2. Replay golden set, score, compare, block merge on regression
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+
+      # Local judge: Ollama + Qwen 2.5 3B (no judge API key needed)
+      - name: Start Ollama judge
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sh
+          nohup ollama serve > /dev/null 2>&1 &
+          for i in $(seq 1 30); do curl -sf localhost:11434 && break || sleep 2; done
+          ollama pull qwen2.5:3b
+      - name: Run gate
+        env:
+          TARGET_API_KEY: ${{ secrets.TARGET_API_KEY }}
+        run: python -m agenteval.cli run --max-drop 5
+
+      # 3. Refresh baseline only after a merge to main
+      - name: Update baseline
+        if: github.ref == 'refs/heads/main'
+        env:
+          TARGET_API_KEY: ${{ secrets.TARGET_API_KEY }}
+        run: python -m agenteval.cli update-baseline
