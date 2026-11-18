@@ -1,0 +1,7 @@
+{
+  "task_success": 1.0,
+  "tool_call_accuracy": 1.0,
+  "faithfulness": 1.0,
+  "cost_usd": 0.001,
+  "latency_s": 0.0228
+}
