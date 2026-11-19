@@ -13,7 +13,7 @@ jobs:
       # 1. Build and start the PR's P1/P2 build (Dockerfile.target = the service under test)
       - name: Start target
         run: |
-          docker build -t target-build -f Dockerfile.target .
+          docker build -t target-build -f Dockerfile .
           docker run -d --name target -p 8000:8000 \
             -e API_KEY=${{ secrets.TARGET_API_KEY }} \
             -e LLM_API_KEY=${{ secrets.LLM_API_KEY }} target-build
